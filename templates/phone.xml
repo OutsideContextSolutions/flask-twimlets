@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    {# If one of our numbers is dialing out #}
+    {% if values.From in reversedNumbers -%}
+        {% if not numberFromSip.match(values.To) %}
+        <Dial callerId="{{reversedNumbers[values.From]}}"><Sip>{{values.To}}</Sip></Dial>
+        {% else %}
+        <Dial callerId="{{reversedNumbers[values.From]}}">{{numberFromSip.match(values.To).group("number")}}</Dial>
+        {% endif %}
+    {# If someone is dialing us from a real phone #}
+    {%- elif values.To in numbers %}
+        <Dial callerId="{{values.From}}"><Sip>{{numbers[values.To]}}</Sip></Dial>
+    {# If someone is dialing us from a sip phone #}
+    {%- elif values.To in reversedNumbers %}
+        <Dial callerId="{{values.From}}"><Sip>{{values.To}}</Sip></Dial>
+    {% else %}
+    {% endif %}
+</Response>
